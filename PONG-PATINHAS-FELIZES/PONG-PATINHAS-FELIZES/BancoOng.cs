@@ -17,7 +17,7 @@ namespace PONG_PATINHAS_FELIZES
 
             Console.Clear();
 
-            /*Console.Write("Informe a instancia do servidor para conexão: ");
+            Console.Write("Informe a instancia do servidor para conexão: ");
             string ip = Console.ReadLine();
 
             Console.Write("Informe o nome da database que será utilizada: ");
@@ -27,10 +27,10 @@ namespace PONG_PATINHAS_FELIZES
             string loguin = Console.ReadLine();
 
             Console.Write("Informe a senha: ");
-            string senha = Console.ReadLine();*/
+            string senha = Console.ReadLine();
 
-            //return Conexao = $"Data Source={ip}; Initial Catalog={database}; User Id={loguin}; Password ={senha}";
-            return Conexao = @"Data Source = localhost; Initial Catalog = ONG; User Id = sa; Password = 227126993";
+            return Conexao = $"Data Source={ip}; Initial Catalog={database}; User Id={loguin}; Password ={senha}";
+            //return Conexao = @"Data Source = localhost; Initial Catalog = ONG; User Id = sa; Password = ";
 
         }
        
