@@ -13,6 +13,7 @@ namespace PONG_PATINHAS_FELIZES
         static void InsertDadosAdotantes(SqlConnection conexao)
         {
             string nome, cpf, sexo, telefone, rua, numero, bairro, cidade, estado;
+            DateTime nascimento = new DateTime();
             char resposta = 'a';
             bool validacao;
             int quantidade = 0;
@@ -111,6 +112,30 @@ namespace PONG_PATINHAS_FELIZES
 
             conexao.Close(); // fechando conexão, pois já foi realizado os testes
 
+            do
+            {
+                Console.Write("INFORME A DATA DE NASCIMENTO DO ADOTANTE: ");
+                try
+                {
+                    nascimento = DateTime.Parse(Console.ReadLine());
+                    validacao = false;
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("\nFormato inválido! [dd/mm/yyyy]\n");
+                    validacao = true;
+                }
+                if (nascimento > DateTime.Now)
+                {
+                    if (!validacao)
+                    {
+                        Console.WriteLine("\nDATA DE NASCIMENTO NÃO PODE SER FUTURA\n");
+                        validacao = true;
+                    }                    
+                }
+
+            } while (validacao);
+
             Console.Write("INFORME O SEXO DO ADOTANTE (Masculino | Feminino | Indefinido): ");
             sexo = Console.ReadLine().ToUpper();
 
@@ -137,11 +162,12 @@ namespace PONG_PATINHAS_FELIZES
 
             cmd = new();
             //Sequencia de intrução em codigo sql para inserir uma Pessoa na tabela
-            cmd.CommandText = "INSERT INTO Pessoa VALUES(@CPF, @NOME, @SEXO, @RUA, @NUMERO, @BAIRRO, @CIDADE, @ESTADO, @TELEFONE);";
+            cmd.CommandText = "INSERT INTO Pessoa VALUES(@CPF, @NOME, @NASCIMENTO, @SEXO, @RUA, @NUMERO, @BAIRRO, @CIDADE, @ESTADO, @TELEFONE);";
 
             cmd.Connection = conexao;
             cmd.Parameters.Add(new SqlParameter("@CPF", cpf));
             cmd.Parameters.Add(new SqlParameter("@NOME", nome));
+            cmd.Parameters.Add(new SqlParameter("@NASCIMENTO", nascimento));
             cmd.Parameters.Add(new SqlParameter("@SEXO", sexo));
             cmd.Parameters.Add(new SqlParameter("@RUA", rua));
             cmd.Parameters.Add(new SqlParameter("@NUMERO", numero));
@@ -179,7 +205,7 @@ namespace PONG_PATINHAS_FELIZES
             Console.WriteLine("PAINEL DE CADASTRO\n\n");
 
             Console.WriteLine("PARACADASTRAR UM NOVO ANIMAL SERÁ OBRIGATÓRIO AS SEGUINTES INFORMAÇÕES INICIAIS: ");
-            Console.WriteLine("\nFAMILIA\nRACA\nSEXO\nNOME(Opcional)\n");
+            Console.WriteLine("\nFAMILIA\nRAÇA\nSEXO\nNOME(Opcional)\n");
             Console.WriteLine("DESEJA CONTINUAR COM O CADASTRO: (s/n)");
             do
             {
@@ -606,6 +632,7 @@ namespace PONG_PATINHAS_FELIZES
         static void EditarDadosAdotantes(SqlConnection conexao)
         {
             string nome, cpf, sexo, telefone, rua, numero, bairro, cidade, estado;
+            DateTime nascimento = new DateTime();
             int opcao = 0, quantidade = 0;
             char resposta = 'a';
             bool validacao;
@@ -695,7 +722,7 @@ namespace PONG_PATINHAS_FELIZES
             
             //Validando possivel error de usuario na opção
             Console.WriteLine("\nINFORME QUAL DADO DESEJA ALTERAR: ");
-            Console.WriteLine("\n1 - NOME\n2 - SEXO\n3 - ENDEREÇO\n4 - TELEFONE\n");
+            Console.WriteLine("\n1 - NOME\n2 - DATA DE NASCIMENTO\n3 - SEXO\n4 - ENDEREÇO\n5 - TELEFONE\n");
             do
             {
                 Console.Write("OPÇÃO: ");
@@ -763,6 +790,52 @@ namespace PONG_PATINHAS_FELIZES
 
                 case 2:
                     Console.Clear();
+                    //Validação de Nome null
+                    do
+                    {
+                        Console.Write("INFORME A DATA DE NASCIMENTO DO(A) ADOTANTE: ");
+                        try
+                        {
+                            nascimento = DateTime.Parse(Console.ReadLine());
+                            validacao = false;
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("\nFORMADO INVÁLIDO! [dd/mm/yyyy]\n");
+                        }
+
+                        if (nascimento > DateTime.Now)
+                        {
+                            Console.WriteLine("\nDATA DE NASCIMENTO NÃO PODE SER FUTURA!\n");
+                        }
+                            
+
+                    } while (validacao);
+
+                    conexao.Open(); // Abrindo conexão
+
+                    cmd = new();
+
+                    cmd.CommandText = "UPDATE Pessoa Set Nascimento = @NASCIMENTO WHERE CPF = @CPF;"; //Aqui fiz o segundo exemple de montar os paramentros 
+                    //linguagem sql para enviar para o banco
+
+                    cmd.Connection = conexao; //Passei o caminho para conexão
+                    cmd.Parameters.Add(new SqlParameter("@CPF", cpf));
+                    cmd.Parameters.Add(new SqlParameter("@NASCIMENTO", nascimento));
+
+                    verificacao = cmd.ExecuteNonQuery(); // verificação para ver se o codigo realmente foi executado, valor retornar quantidade de linhas afetadas
+                    conexao.Close();
+
+                    if (verificacao > 0)
+                    {
+                        Console.WriteLine("\nEDITADO COM SUCESSO!");
+                        Console.ReadKey();
+                        break;
+                    }
+                    break;
+
+                case 3:
+                    Console.Clear();
 
                     Console.Write("INFORME O SEXO DO(A) ADOTANTE(Masculino | Feminino | Indefinido): ");
                     sexo = Console.ReadLine().ToUpper(); ;
@@ -788,7 +861,7 @@ namespace PONG_PATINHAS_FELIZES
                     }
                     break;
 
-                case 3:
+                case 4:
                     Console.Clear();
 
                     Console.Write("INFORME A RUA: ");
@@ -832,7 +905,7 @@ namespace PONG_PATINHAS_FELIZES
                     break;
 
 
-                case 4:
+                case 5:
                     Console.Clear();
 
                     Console.Write("INFORME O TELEFONE DO ADOTANTE: ");
@@ -1200,12 +1273,14 @@ namespace PONG_PATINHAS_FELIZES
                 //}
                 #endregion
 
-                cmd.CommandText = "SELECT pessoa.Nome, pessoa.CPF, pessoa.Sexo, pessoa.Telefone, " +
+                cmd = new();
+
+                cmd.CommandText = "SELECT pessoa.Nome, pessoa.CPF, pessoa.Nascimento, pessoa.Telefone, pessoa.Sexo, " +
                               "pessoa.Rua, pessoa.Numero, pessoa.Bairro, pessoa.Cidade, pessoa.Estado FROM Pessoa " +
                               "WHERE CPF = @CPF;";
 
 
-                cmd = new SqlCommand("SELECT * FROM Pessoa WHERE CPF = @CPF", conexao);
+                cmd.Connection = conexao;
 
                 cmd.Parameters.Add(new SqlParameter("@CPF", cpf));
 
@@ -1217,9 +1292,10 @@ namespace PONG_PATINHAS_FELIZES
                         Console.WriteLine("DADOS ADOTANTE\n");
                         Console.WriteLine($"NOME: {reader.GetString(0)}");
                         Console.WriteLine($"CPF: {reader.GetString(1)}");
-                        Console.WriteLine($"TELEFONE: {reader.GetString(2)}");
-                        Console.WriteLine($"SEXO: {reader.GetString(3)}");
-                        Console.WriteLine($"RUA: {reader.GetString(4)} º{reader.GetString(5)}. {reader.GetString(6)}, {reader.GetString(7)} - {reader.GetString(8)}\n");
+                        Console.WriteLine($"NASCIMENTO: {reader.GetDateTime(2).ToShortDateString()}");
+                        Console.WriteLine($"TELEFONE: {reader.GetString(3)}");
+                        Console.WriteLine($"SEXO: {reader.GetString(4)}");
+                        Console.WriteLine($"RUA: {reader.GetString(5)} º{reader.GetString(6)}. {reader.GetString(7)}, {reader.GetString(8)} - {reader.GetString(9)}\n");
 
                     }
                 }
@@ -1240,7 +1316,7 @@ namespace PONG_PATINHAS_FELIZES
             //cmd.Connection = conexao;
             #endregion
 
-            cmd = new SqlCommand("SELECT pessoa.Nome, pessoa.CPF, pessoa.Sexo, pessoa.Telefone, " +
+            cmd = new SqlCommand("SELECT pessoa.Nome, pessoa.CPF, pessoa.Nascimento, pessoa.Sexo, pessoa.Telefone, " +
                                  "pessoa.Rua, pessoa.Numero, pessoa.Bairro, pessoa.Cidade, pessoa.Estado FROM Pessoa;", conexao);
 
             using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1250,9 +1326,10 @@ namespace PONG_PATINHAS_FELIZES
                     Console.WriteLine("DADOS ADOTANTE\n");
                     Console.WriteLine($"NOME: {reader.GetString(0)}");
                     Console.WriteLine($"CPF: {reader.GetString(1)}");
-                    Console.WriteLine($"TELEFONE: {reader.GetString(2)}");
-                    Console.WriteLine($"SEXO: {reader.GetString(3)}");
-                    Console.WriteLine($"RUA: {reader.GetString(4)} º{reader.GetString(5)}. {reader.GetString(6)}, {reader.GetString(7)} - {reader.GetString(8)}\n");
+                    Console.WriteLine($"DATA DE NASCIMENTO: {reader.GetDateTime(2).ToShortDateString()}");
+                    Console.WriteLine($"TELEFONE: {reader.GetString(3)}");
+                    Console.WriteLine($"SEXO: {reader.GetString(4)}");
+                    Console.WriteLine($"RUA: {reader.GetString(5)} º{reader.GetString(6)}. {reader.GetString(7)}, {reader.GetString(8)} - {reader.GetString(9)}\n");
                 }
             }
 

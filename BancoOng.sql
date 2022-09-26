@@ -4,7 +4,8 @@ USE ONG;
 
 CREATE TABLE Pessoa(
 	CPF VARCHAR(14) CONSTRAINT PK_Pessoa PRIMARY KEY,
-	Nome VARCHAR(50) NOT NULL,
+	Nome VARCHAR(50) NOT NULL,	
+	Nascimento date,
 	Sexo VARCHAR(10),
 	Rua VARCHAR(20),
 	Numero VARCHAR(10),
@@ -29,3 +30,4 @@ CREATE TABLE Pessoa_Adota_Animal(
 CREATE TABLE Animais_Disponiveis(
 	CHIP INT CONSTRAINT PK_Animais_Disp FOREIGN KEY (CHIP) REFERENCES Animal(CHIP),
 	CONSTRAINT PK_Animais_Disponiveis PRIMARY KEY(CHIP));
+
