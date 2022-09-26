@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Intrinsics.Arm;
 
 namespace PONG_PATINHAS_FELIZES
 {
     internal class Program
     {
+
         #region Inserts Tabelas
         static void InsertDadosAdotantes(SqlConnection conexao)
         {
@@ -77,9 +74,9 @@ namespace PONG_PATINHAS_FELIZES
                 cpf = Console.ReadLine().ToUpper();
                 validacao = false;
 
-                if (cpf.Length == 0)
+                if (cpf.Length < 11 || cpf.Length > 11)
                 {
-                    Console.WriteLine("\nCPF OBRIGATÓRIO!\n");
+                    Console.WriteLine("\nCPF DEVE CONTER 11 DIGITOS!\n");
                     validacao = true;
                 }
 
@@ -466,9 +463,9 @@ namespace PONG_PATINHAS_FELIZES
                 cpf = Console.ReadLine().ToUpper();
                 validacao = false;
 
-                if (cpf.Length == 0)
+                if (cpf.Length < 11 || cpf.Length > 11)
                 {
-                    Console.WriteLine("\nCPF OBRIGATÓRIO!\n");
+                    Console.WriteLine("\nCPF DEVE CONTER 11 DIGITOS!\n");
                     validacao = true;
                 }
 
@@ -685,9 +682,9 @@ namespace PONG_PATINHAS_FELIZES
                 cpf = Console.ReadLine().ToUpper();
                 validacao = false;
 
-                if (cpf.Length == 0)
+                if (cpf.Length < 11 || cpf.Length > 11)
                 {
-                    Console.WriteLine("\nCPF OBRIGATÓRIO!\n");
+                    Console.WriteLine("\nCPF DEVE CONTER 11 DIGITOS!\n");
                     validacao = true;
                 }
 
@@ -736,7 +733,7 @@ namespace PONG_PATINHAS_FELIZES
                     Console.WriteLine("\nPARAMETRO DE ENTRADA INVÁLIDO!\n");
                     validacao = true;
                 }
-                if (opcao < 1 || opcao > 4)
+                if (opcao < 1 || opcao > 5)
                 {
                     if (!validacao)
                     {
@@ -1220,9 +1217,9 @@ namespace PONG_PATINHAS_FELIZES
                     cpf = Console.ReadLine().ToUpper();
                     validacao = false;
 
-                    if (cpf.Length == 0)
+                    if (cpf.Length < 11 || cpf.Length > 11)
                     {
-                        Console.WriteLine("\nCPF OBRIGATÓRIO!\n");
+                        Console.WriteLine("\nCPF DEVE CONTER 11 DIGITOS!\n");
                         validacao = true;
                     }
 
